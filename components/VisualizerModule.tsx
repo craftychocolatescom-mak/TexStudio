@@ -5,6 +5,7 @@ import { geminiService } from '../services/geminiService.ts';
 import { supabase } from '../services/supabaseClient';
 import { ModelSettings } from '../types.ts';
 import { generatePDF } from '../utils/pdfHelper';
+import { compressImage } from '../utils/imageOptimizer';
 
 interface CalloutMetadata {
   buttonSize?: string;
@@ -317,18 +318,33 @@ export const VisualizerModule: React.FC<VisualizerModuleProps> = ({ onComplete, 
     return () => clearInterval(interval);
   }, [loading, refining]);
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>, type: 'front' | 'back' | 'side' | 'swatch') => {
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>, type: 'front' | 'back' | 'side' | 'swatch') => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const res = reader.result as string;
-        if (type === 'front') setSketchFront(res);
-        else if (type === 'back') setSketchBack(res);
-        else if (type === 'side') setSketchSide(res);
-        else { setTempSwatch(res); setIsCropping(true); }
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedFile = await compressImage(file, { maxWidth: 1024, maxHeight: 1024, quality: 0.8 });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const res = reader.result as string;
+          if (type === 'front') setSketchFront(res);
+          else if (type === 'back') setSketchBack(res);
+          else if (type === 'side') setSketchSide(res);
+          else { setTempSwatch(res); setIsCropping(true); }
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (err) {
+        console.error("Image compression failed, falling back to original:", err);
+        // Fallback to original
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const res = reader.result as string;
+          if (type === 'front') setSketchFront(res);
+          else if (type === 'back') setSketchBack(res);
+          else if (type === 'side') setSketchSide(res);
+          else { setTempSwatch(res); setIsCropping(true); }
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
