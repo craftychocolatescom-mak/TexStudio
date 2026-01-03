@@ -507,9 +507,13 @@ export const VisualizerModule: React.FC<VisualizerModuleProps> = ({ onComplete, 
 
       if (dbError) throw dbError;
       console.log("Saved to project successfully");
+      // Optional: Add a subtle toast or indicator here if a toast library is added later.
+      // For now, we rely on the console and potential future UI updates.
+      // A simple non-blocking notification could be added if critical.
 
     } catch (error) {
       console.error("Auto-save failed:", error);
+      // In production, this should trigger a user-facing error toast.
     }
   };
 
