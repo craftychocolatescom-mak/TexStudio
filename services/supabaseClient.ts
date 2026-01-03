@@ -1,14 +1,46 @@
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-    console.error("Missing Supabase environment variables. Please check your .env file.");
-}
+// Create a mock supabase client for demo mode when env vars are missing
+const createMockClient = (): SupabaseClient => {
+    console.warn("⚠️ Running in DEMO MODE - Supabase not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env.local");
 
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
+    const mockAuth = {
+        getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+        signInWithOAuth: () => Promise.resolve({ data: null, error: { message: 'Demo mode - auth disabled' } }),
+        signOut: () => Promise.resolve({ error: null }),
+    };
+
+    const mockStorage = {
+        from: () => ({
+            upload: () => Promise.resolve({ error: { message: 'Demo mode' } }),
+            getPublicUrl: () => ({ data: { publicUrl: '' } }),
+        }),
+    };
+
+    const mockFrom = () => ({
+        select: () => Promise.resolve({ data: [], error: null }),
+        insert: () => Promise.resolve({ data: null, error: { message: 'Demo mode' } }),
+        update: () => Promise.resolve({ data: null, error: null }),
+        delete: () => Promise.resolve({ data: null, error: null }),
+    });
+
+    return {
+        auth: mockAuth,
+        storage: mockStorage,
+        from: mockFrom,
+    } as unknown as SupabaseClient;
+};
+
+export const supabase = (supabaseUrl && supabaseAnonKey)
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : createMockClient();
+
+export const isDemoMode = !supabaseUrl || !supabaseAnonKey;
 
 export type Profile = {
     id: string;
