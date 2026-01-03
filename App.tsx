@@ -15,12 +15,28 @@ import { HistoryItem, TabType } from './types';
 const App: React.FC = () => {
   const [session, setSession] = useState<any>(null);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [demoMode, setDemoMode] = useState(false);
 
   const [activeTab, setActiveTab] = useState<TabType>('visualizer');
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryItem | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Demo project for testing
+  const DEMO_PROJECT: Project = {
+    id: 'demo-project-001',
+    user_id: 'demo-user',
+    name: 'Demo Project',
+    description: 'Testing Studio Environment',
+    created_at: new Date().toISOString(),
+  };
+
+  const handleEnterDemoMode = () => {
+    setDemoMode(true);
+    setActiveProject(DEMO_PROJECT);
+    setLoading(false);
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -38,6 +54,11 @@ const App: React.FC = () => {
   }, []);
 
   const handleLogout = async () => {
+    if (demoMode) {
+      setDemoMode(false);
+      setActiveProject(null);
+      return;
+    }
     await supabase.auth.signOut();
     setActiveProject(null);
   };
@@ -72,8 +93,8 @@ const App: React.FC = () => {
     );
   }
 
-  if (!session) {
-    return <LandingPage onLogin={() => { }} onLoadDemo={() => { }} />;
+  if (!session && !demoMode) {
+    return <LandingPage onLogin={() => { }} onLoadDemo={handleEnterDemoMode} />;
   }
 
   if (!activeProject) {
