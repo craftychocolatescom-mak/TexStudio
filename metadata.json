@@ -1,0 +1,7 @@
+{
+  "name": "TexVision Studio",
+  "description": "A high-fidelity garment pre-production platform specializing in visual mockups, cost engineering, and technical pattern correction using Gemini AI.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
