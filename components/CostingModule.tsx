@@ -172,7 +172,7 @@ export const CostingModule: React.FC<CostingModuleProps> = ({ onComplete, source
             </div>
 
             <div className="lg:col-span-3 space-y-8">
-               <div className="bg-slate-900 border border-slate-800 rounded-[40px] shadow-2xl overflow-hidden flex flex-col min-h-[600px]">
+               <div id="cost-sheet-content" className="bg-slate-900 border border-slate-800 rounded-[40px] shadow-2xl overflow-hidden flex flex-col min-h-[600px]">
                   <div className="bg-slate-950 px-8 py-4 border-b border-slate-800 flex justify-between items-center flex-wrap gap-4">
                      <div className="flex gap-6">
                         {(['summary', 'bom', 'labor'] as const).map(tab => (

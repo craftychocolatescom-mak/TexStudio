@@ -772,7 +772,7 @@ export const VisualizerModule: React.FC<VisualizerModuleProps> = ({ onComplete, 
                 ))}
               </div>
 
-              <div className="relative aspect-[3/4] bg-white rounded-[40px] overflow-hidden border border-slate-700 shadow-2xl flex items-center justify-center">
+              <div id="tech-pack-content" className="relative aspect-[3/4] bg-white rounded-[40px] overflow-hidden border border-slate-700 shadow-2xl flex items-center justify-center">
                 {hubView === 'side-by-side' ? (
                   <div className="relative w-full h-full flex flex-col">
                     <div className="flex-1 relative bg-slate-50">

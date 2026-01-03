@@ -2,11 +2,11 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-export const generatePDF = async (elementId: string, filename: string) => {
+export const generatePDF = async (elementId: string, filename: string): Promise<boolean> => {
     const element = document.getElementById(elementId);
     if (!element) {
         console.error(`Element with id ${elementId} not found`);
-        return;
+        return false;
     }
 
     try {
@@ -14,6 +14,8 @@ export const generatePDF = async (elementId: string, filename: string) => {
             scale: 2, // High resolution
             useCORS: true, // Allow cross-origin images
             logging: false,
+            allowTaint: true,
+            backgroundColor: '#ffffff', // Ensure white background
         });
 
         const imgData = canvas.toDataURL('image/png');
@@ -40,7 +42,9 @@ export const generatePDF = async (elementId: string, filename: string) => {
         }
 
         pdf.save(`${filename}.pdf`);
+        return true;
     } catch (error) {
         console.error('Error generating PDF:', error);
+        return false;
     }
 };
